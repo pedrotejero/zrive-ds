@@ -22,7 +22,6 @@ def get_data_meteo_api(city: str, start_date: str = "2010-01-01", end_date: str 
     }
     response = api_request(API_URL, params)
     
-    # Schema validation
     try:
         validate(instance=response, schema=RESPONSE_SCHEMA)
     except ValidationError as e:
@@ -52,8 +51,9 @@ def main():
     }
     for city in COORDINATES.keys():
         df_daily = get_data_meteo_api(city, start_date, end_date)
-        df_monthly = df_temporary_reduction(df_daily, aggregation_map, freq='M')
+        df_monthly = df_temporary_reduction(df_daily, aggregation_map, freq='ME')
         processed_data[city] = df_monthly
+
 
 if __name__ == "__main__":
     main()

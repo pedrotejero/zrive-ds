@@ -52,7 +52,7 @@ def check_date_format(date: str) -> str:
         raise ValueError(f"Invalid date format: {date}. Expected format: YYYY-MM-DD")
     return date
 
-def df_temporary_reduction(df: pd.DataFrame, aggregation_map: dict, freq: str = 'M') -> pd.DataFrame:
+def df_temporary_reduction(df: pd.DataFrame, aggregation_map: dict, freq: str = 'ME') -> pd.DataFrame:
     """
     Resamples the data at given frequency (e.g., 'M' for monthly, 'Y' for yearly) and returns the aggregated DataFrame.
     """
