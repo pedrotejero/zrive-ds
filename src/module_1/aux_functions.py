@@ -1,6 +1,7 @@
 import requests
 import time
 import random
+import pandas as pd
 
 def api_request(url: str, params: dict, max_retries: int = 3, base_backoff: float = 1.0) -> dict:
     """
@@ -40,3 +41,20 @@ def api_request(url: str, params: dict, max_retries: int = 3, base_backoff: floa
             response.raise_for_status()
     
     raise RuntimeError(f"Failed after {max_retries} attempts")
+
+def check_date_format(date: str) -> str:
+    """
+    Date format Required by Open-Meteo API: ISO8601 (YYYY-MM-DD)
+    """
+    try:
+        pd.to_datetime(date, format="%Y-%m-%d")
+    except ValueError:
+        raise ValueError(f"Invalid date format: {date}. Expected format: YYYY-MM-DD")
+    return date
+
+def df_temporary_reduction(df: pd.DataFrame, aggregation_map: dict, freq: str = 'M') -> pd.DataFrame:
+    """
+    Resamples the data at given frequency (e.g., 'M' for monthly, 'Y' for yearly) and returns the aggregated DataFrame.
+    """
+    resampled = df.resample(freq).agg(aggregation_map)
+    return resampled

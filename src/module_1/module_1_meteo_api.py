@@ -3,7 +3,7 @@ from jsonschema import validate, ValidationError
 
 from static_variables import COORDINATES, VARIABLES, API_URL
 from schema import RESPONSE_SCHEMA
-from aux_functions import api_request
+from aux_functions import api_request, df_temporary_reduction, check_date_format
 
 
 def get_data_meteo_api(city: str, start_date: str = "2010-01-01", end_date: str = "2020-12-31") -> pd.DataFrame:
@@ -36,7 +36,24 @@ def get_data_meteo_api(city: str, start_date: str = "2010-01-01", end_date: str 
 
 
 def main():
-    get_data_meteo_api("London", "2010-01-01", "2020-12-31")
+    start_date = '2010-01-01'
+    end_date = '2020-12-31'
+
+    start_date = check_date_format(start_date)
+    end_date = check_date_format(end_date)
+    if start_date > end_date:
+        raise ValueError("Start date must be before end date.")
+
+    processed_data = {}
+    aggregation_map = {
+        'temperature_2m_mean': 'mean',
+        'precipitation_sum': 'sum',
+        'wind_speed_10m_max': 'max'
+    }
+    for city in COORDINATES.keys():
+        df_daily = get_data_meteo_api(city, start_date, end_date)
+        df_monthly = df_temporary_reduction(df_daily, aggregation_map, freq='M')
+        processed_data[city] = df_monthly
 
 if __name__ == "__main__":
     main()
