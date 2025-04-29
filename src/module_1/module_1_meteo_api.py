@@ -3,7 +3,7 @@ from jsonschema import validate, ValidationError
 
 from static_variables import COORDINATES, VARIABLES, API_URL
 from schema import RESPONSE_SCHEMA
-from aux_functions import api_request, df_temporary_reduction, check_date_format
+from aux_functions import api_request, df_temporary_reduction, check_date_format, plot_variable
 
 
 def get_data_meteo_api(city: str, start_date: str = "2010-01-01", end_date: str = "2020-12-31") -> pd.DataFrame:
@@ -53,6 +53,9 @@ def main():
         df_daily = get_data_meteo_api(city, start_date, end_date)
         df_monthly = df_temporary_reduction(df_daily, aggregation_map, freq='ME')
         processed_data[city] = df_monthly
+    
+    for var in VARIABLES:
+        plot_variable(processed_data, var)
 
 
 if __name__ == "__main__":

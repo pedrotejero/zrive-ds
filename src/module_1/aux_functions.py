@@ -2,6 +2,7 @@ import requests
 import time
 import random
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def api_request(url: str, params: dict, max_retries: int = 3, base_backoff: float = 1.0) -> dict:
     """
@@ -58,3 +59,17 @@ def df_temporary_reduction(df: pd.DataFrame, aggregation_map: dict, freq: str = 
     """
     resampled = df.resample(freq).agg(aggregation_map)
     return resampled
+
+def plot_variable(data: dict, variable: str):
+    """
+    Plots a given variable for multiple cities over time.
+    """
+    plt.figure(figsize=(10, 6))
+    for city, df in data.items():
+        plt.plot(df.index, df[variable], label=city)
+    plt.title(f"{variable} evolution ({data[city].index.min().date()} to {data[city].index.max().date()})")
+    plt.xlabel('Date')
+    plt.ylabel(variable)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
