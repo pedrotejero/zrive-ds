@@ -4,24 +4,27 @@ import random
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def api_request(url: str, params: dict, max_retries: int = 3, base_backoff: float = 1.0) -> dict:
+
+def api_request(
+    url: str, params: dict, max_retries: int = 3, base_backoff: float = 1.0
+) -> dict:
     """
     Generic API call with exponential backoff, jitter, and error handling.
     """
     for attempt in range(1, max_retries + 1):
         response = requests.get(url, params=params)
-        
+
         if response.status_code == 200:
             try:
                 return response.json()
             except ValueError:
                 raise RuntimeError("Invalid JSON in response")
-        
+
         elif response.status_code == 400:
             # Bad request, likely invalid parameters
             # open-meteo API provides an specific error message
             raise RuntimeError(f"Bad request: {response.reason}")
-        
+
         elif response.status_code in (429, 502, 503, 504):
             # Handle Retry-After if provided
             retry_after = response.headers.get("Retry-After")
@@ -35,13 +38,14 @@ def api_request(url: str, params: dict, max_retries: int = 3, base_backoff: floa
 
             if attempt == max_retries:
                 break  # After the last attempt, don't sleep
-            
+
             time.sleep(wait_time)
-        
+
         else:
             response.raise_for_status()
-    
+
     raise RuntimeError(f"Failed after {max_retries} attempts")
+
 
 def check_date_format(date: str) -> str:
     """
@@ -53,12 +57,17 @@ def check_date_format(date: str) -> str:
         raise ValueError(f"Invalid date format: {date}. Expected format: YYYY-MM-DD")
     return date
 
-def df_temporary_reduction(df: pd.DataFrame, aggregation_map: dict, freq: str = 'ME') -> pd.DataFrame:
+
+def df_temporary_reduction(
+    df: pd.DataFrame, aggregation_map: dict, freq: str = "ME"
+) -> pd.DataFrame:
     """
-    Resamples the data at given frequency (e.g., 'M' for monthly, 'Y' for yearly) and returns the aggregated DataFrame.
+    Resamples the data at given frequency (e.g., 'M' for monthly)
+    and returns the aggregated DataFrame.
     """
     resampled = df.resample(freq).agg(aggregation_map)
     return resampled
+
 
 def plot_variable(data: dict, variable: str):
     """
@@ -67,8 +76,11 @@ def plot_variable(data: dict, variable: str):
     plt.figure(figsize=(10, 6))
     for city, df in data.items():
         plt.plot(df.index, df[variable], label=city)
-    plt.title(f"{variable} evolution ({data[city].index.min().date()} to {data[city].index.max().date()})")
-    plt.xlabel('Date')
+
+    min_date = data[city].index.min().date()
+    max_date = data[city].index.max().date()
+    plt.title(f"{variable} evolution ({min_date} to {max_date})")
+    plt.xlabel("Date")
     plt.ylabel(variable)
     plt.legend()
     plt.tight_layout()
