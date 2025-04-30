@@ -161,3 +161,8 @@ cython_debug/
 
 # Documentation
 *.pdf
+*.docx
+*.doc
+*.odt
+
+plots/
