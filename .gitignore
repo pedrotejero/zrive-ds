@@ -166,3 +166,4 @@ cython_debug/
 *.odt
 
 plots/
+config.py
