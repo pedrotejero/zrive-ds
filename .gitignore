@@ -164,5 +164,7 @@ cython_debug/
 *.docx
 *.doc
 *.odt
+*.md
 
 plots/
+data/
