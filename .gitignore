@@ -165,4 +165,7 @@ cython_debug/
 *.doc
 *.odt
 
+
 plots/
+data/
+nbconvert/
