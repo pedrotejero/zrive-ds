@@ -21,6 +21,7 @@ boto3 = "^1.38.6"
 fastparquet = "^2024.11.0"
 seaborn = "^0.13.2"
 pandoc = "^2.4"
+psutil = "^7.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
