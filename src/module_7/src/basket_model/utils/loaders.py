@@ -8,6 +8,8 @@ STORAGE = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..", "d
 def load_orders() -> pd.DataFrame:
     orders = pd.read_parquet(os.path.join(STORAGE, "orders.parquet"))
     orders = orders.sort_values(by=["user_id", "created_at"])
+    # Rename ordered_items to item_ids for consistency with feature processing
+    orders["item_ids"] = orders["ordered_items"]
     orders["item_count"] = orders.apply(lambda x: len(x.item_ids), axis=1)
     orders["user_order_seq"] = (
         orders.groupby(["user_id"])["created_at"].rank().astype(int)
@@ -21,4 +23,4 @@ def load_regulars() -> pd.DataFrame:
 
 def get_mean_item_price() -> float:
     inventory = pd.read_parquet(os.path.join(STORAGE, "inventory.parquet"))
-    return inventory.our_price.mean()
+    return inventory.price.mean()

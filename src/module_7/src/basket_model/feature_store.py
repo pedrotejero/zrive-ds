@@ -10,8 +10,13 @@ class FeatureStore:
         orders = loaders.load_orders()
         regulars = loaders.load_regulars()
         mean_item_price = loaders.get_mean_item_price()
+        feature_frame = features.build_feature_frame(orders, regulars, mean_item_price)
+        
+        # Handle duplicate user IDs by taking the most recent features (latest created_at)
+        feature_frame = feature_frame.sort_values('created_at').drop_duplicates('user_id', keep='last')
+        
         self.feature_store = (
-            features.build_feature_frame(orders, regulars, mean_item_price)
+            feature_frame
             .set_index("user_id")
             .loc[
                 :,
